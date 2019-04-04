@@ -24,6 +24,7 @@ route_colors = {
     "Y": "Yellow",
 }
 
+# This should be dynamically generated from the city of chicago api...
 station_mapping = {
     "Howard": "40900"
 }
@@ -144,9 +145,25 @@ def get_next_train_intent(intent, session):
     card_title = intent["name"]
     should_end_session = True
 
-    color = intent["slots"]["color"]["value"]
-    station = intent["slots"]["station"]["value"]
-    destination = intent["slots"]["station"]["value"]
+    color = None
+    destination = None
+
+    if intent["slots"].get("station"):
+        station = intent["slots"]["station"]["value"]
+    else:
+        return build_response(
+            {},
+            build_speechlet_response(
+                card_title,
+                "Please specify a station in your request",
+                None,
+                should_end_session
+            )
+        )
+    if intent["slots"].get("color"):
+        color = intent["slots"]["color"]["value"]
+    if intent["slots"].get("destination"):
+        destination = intent["slots"]["station"]["value"]
 
     data = get_next_train(station, color, destination)
 
@@ -164,7 +181,8 @@ def get_next_train_intent(intent, session):
     return build_response(
         {},
         build_speechlet_response(
-            card_title, speech_output, None, should_end_session),
+            card_title, speech_output, None, should_end_session
+        ),
     )
 
 
