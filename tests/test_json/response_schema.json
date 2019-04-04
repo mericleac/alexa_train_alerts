@@ -1,0 +1,65 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Get Next Train Response",
+    "description": "A response for a get next train intent",
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "string",
+            "description": "Alexa's response version number"
+        },
+        "sessionAttributes": {
+            "type": "object",
+            "description": "stores data for each session"
+        },
+        "response": {
+            "type": "object",
+            "description": "the response object",
+            "properties": {
+                "outputSpeech": {
+                    "type": "object",
+                    "description": "Descripes Alexas audible response",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        },
+                        "text": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "card": {
+                    "type": "object",
+                    "description": "Visual card for Alexa devices with screens",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        },
+                        "title": {
+                            "type": "string"
+                        },
+                        "content": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "reprompt": {
+                    "type": "object",
+                    "description": "An outputSpeech object used when the user expresses confusion",
+                    "properties": {
+                        "outputSpeech": {
+                            "type": "object",
+                            "description": "Descripes Alexas audible response",
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                },
+                                "text": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

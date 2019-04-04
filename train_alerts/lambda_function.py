@@ -8,9 +8,10 @@ http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
-import requests
 import datetime
 import math
+import json
+import requests
 
 route_colors = {
     "Red": "Red",
@@ -21,6 +22,10 @@ route_colors = {
     "P": "Purple",
     "Pink": "Pink",
     "Y": "Yellow",
+}
+
+station_mapping = {
+    "Howard": "40900"
 }
 
 # --------------- Helpers that build all of the responses ----------------------
@@ -50,14 +55,16 @@ def build_response(session_attributes, speechlet_response):
 # --------------- Helpers that fetch CTA Api data ------------------------------
 
 
-def get_next_train(color=None, destination=None, station=None):
+def get_next_train(station, color=None, destination=None):
 
     data = requests.get(
-        url="http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=0fc2e48c0ad84d99923e89e8607776cd&max=1&mapid=40360&outputType=JSON"
-    )
+        "http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=0fc2e48c0ad84d99923e89e8607776cd&max=1&mapid={station_num}&outputType=JSON"
+        .format(station_num=station_mapping[station])
+    ).json()
 
     time_to_arrival = (
-        datetime.datetime.strptime(data["ctatt"]["eta"][0]["arrT"], "%Y-%m-%dT%H:%M:%S")
+        datetime.datetime.strptime(
+            data["ctatt"]["eta"][0]["arrT"], "%Y-%m-%dT%H:%M:%S")
         - datetime.datetime.now()
     )
 
@@ -128,7 +135,8 @@ def handle_session_end_request():
     should_end_session = True
     return build_response(
         {},
-        build_speechlet_response(card_title, speech_output, None, should_end_session),
+        build_speechlet_response(
+            card_title, speech_output, None, should_end_session),
     )
 
 
@@ -140,7 +148,7 @@ def get_next_train_intent(intent, session):
     station = intent["slots"]["station"]["value"]
     destination = intent["slots"]["station"]["value"]
 
-    data = get_next_train(color, destination, station)
+    data = get_next_train(station, color, destination)
 
     speech_output = (
         "The next %s bound %s Line train "
@@ -155,75 +163,8 @@ def get_next_train_intent(intent, session):
 
     return build_response(
         {},
-        build_speechlet_response(card_title, speech_output, None, should_end_session),
-    )
-
-
-def create_favorite_color_attributes(favorite_color):
-    return {"favoriteColor": favorite_color}
-
-
-def set_color_in_session(intent, session):
-    """ Sets the color in the session and prepares the speech to reply to the
-    user.
-    """
-
-    card_title = intent["name"]
-    session_attributes = {}
-    should_end_session = False
-
-    if "Color" in intent["slots"]:
-        favorite_color = intent["slots"]["Color"]["value"]
-        session_attributes = create_favorite_color_attributes(favorite_color)
-        speech_output = (
-            "I now know your favorite color is "
-            + favorite_color
-            + ". You can ask me your favorite color by saying, "
-            "what's my favorite color?"
-        )
-        reprompt_text = (
-            "You can ask me your favorite color by saying, " "what's my favorite color?"
-        )
-    else:
-        speech_output = "I'm not sure what your favorite color is. " "Please try again."
-        reprompt_text = (
-            "I'm not sure what your favorite color is. "
-            "You can tell me your favorite color by saying, "
-            "my favorite color is red."
-        )
-    return build_response(
-        session_attributes,
         build_speechlet_response(
-            card_title, speech_output, reprompt_text, should_end_session
-        ),
-    )
-
-
-def get_color_from_session(intent, session):
-    session_attributes = {}
-    reprompt_text = None
-
-    if session.get("attributes", {}) and "favoriteColor" in session.get(
-        "attributes", {}
-    ):
-        favorite_color = session["attributes"]["favoriteColor"]
-        speech_output = "Your favorite color is " + favorite_color + ". Goodbye."
-        should_end_session = True
-    else:
-        speech_output = (
-            "I'm not sure what your favorite color is. "
-            "You can say, my favorite color is red."
-        )
-        should_end_session = False
-
-    # Setting reprompt_text to None signifies that we do not want to reprompt
-    # the user. If the user does not respond or says something that is not
-    # understood, the session will end.
-    return build_response(
-        session_attributes,
-        build_speechlet_response(
-            intent["name"], speech_output, reprompt_text, should_end_session
-        ),
+            card_title, speech_output, None, should_end_session),
     )
 
 
@@ -328,4 +269,3 @@ def lambda_handler(event, context):
         return on_intent(event["request"], event["session"])
     elif event["request"]["type"] == "SessionEndedRequest":
         return on_session_ended(event["request"], event["session"])
-

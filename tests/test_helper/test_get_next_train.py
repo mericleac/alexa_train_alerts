@@ -18,7 +18,7 @@ def test_get_next_train_with_parameters(requests_mock):
     destination = "Loop"
     station = "Pulaski"
 
-    requests_mock.get.return_value = cta_json
+    requests_mock.get.return_value = Mock(json=lambda: cta_json)
 
     res = get_next_train(color, destination, station)
 
