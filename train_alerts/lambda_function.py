@@ -24,6 +24,13 @@ route_colors = {
     "Y": "Yellow",
 }
 
+direction_mapping = {
+    "North": "N",
+    "South": "S",
+    "East": "E",
+    "West": "W"
+}
+
 # This should be dynamically generated from the city of chicago api...
 station_mapping = {
     "Howard": "40900"
@@ -75,6 +82,28 @@ def get_next_train(station, color=None, destination=None):
         "station": data["ctatt"]["eta"][0]["staNm"],
         "minutes_to_arrival": math.ceil(time_to_arrival.total_seconds() / 60),
     }
+
+
+def get_stop_id(station, direction=None, destination=None):
+    if direction is not None:
+        data = requests.get(
+            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}&direction_id={direction}"
+            .format(station=station, direction=direction_mapping[direction])
+        ).json()
+        query = "stop_id=" + data[0]["stop_id"]
+    elif destination is not None:
+        data = requests.get(
+            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}&$where=stop_name like '%25{destination}%25"
+            .format(station=station, destination=destination)
+        ).json()
+        query = "stop_id=" + data[0]["stop_id"]
+    else:
+        data = requests.get(
+            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}"
+            .format(station=station)
+        ).json()
+        query = "map_id=" + data[0]["map_id"]
+    return query
 
 
 # --------------- Functions that control the skill's behavior ------------------
