@@ -24,6 +24,18 @@ route_colors = {
     "Y": "Yellow",
 }
 
+# Will eventually need to add support for purple express
+chi_data_color_mapping = {
+    "Red": "red",
+    "Blue": "blue",
+    "Brown": "brn",
+    "Green": "g",
+    "Orange": "o",
+    "Purple": "p",
+    "Pink": "pnk",
+    "Yellow": "y"
+}
+
 direction_mapping = {
     "North": "N",
     "South": "S",
@@ -79,26 +91,23 @@ def get_next_train(station, color=None, destination=None):
     }
 
 
-def get_stop_id(station, direction=None, destination=None):
+def get_stop_id(station, direction=None, destination=None, color=None):
+    query = "station_name={station}".format(station=station)
     if direction is not None:
-        data = requests.get(
-            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}&direction_id={direction}&$where=stop_name%20not%20like%20%27%25Terminal%20arrival%25%27"
-            .format(station=station, direction=direction_mapping[direction])
-        ).json()
-        query = "stpid=" + data[0]["stop_id"]
-    elif destination is not None:
-        data = requests.get(
-            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}&$where=stop_name like '%25{destination}%25"
-            .format(station=station, destination=destination)
-        ).json()
-        query = "stpid=" + data[0]["stop_id"]
-    else:
-        data = requests.get(
-            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}"
-            .format(station=station)
-        ).json()
-        query = "mapid=" + data[0]["map_id"]
-    return query
+        query += "direction_id={direction}".format(
+            direction=direction_mapping[direction])
+    if destination is not None:
+        query += "$where=stop_name like '%25{destination}%25'".format(
+            destination=destination)
+    if color is not None:
+        query += "{color}=true".format(color=chi_data_color_mapping[color])
+
+    data = requests.get(
+        "https://data.cityofchicago.org/resource/8mj8-j3c4.json?{query}"
+        .format(query=query)
+    ).json()
+
+    return "stpid={stpid}".format(stpid=data[0]["stop_id"]) if len(data) == 1 else "mapid={mapid}".format(mapid=data[0]["map_id"])
 
 
 # --------------- Functions that control the skill's behavior ------------------
