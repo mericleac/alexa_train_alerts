@@ -16,7 +16,7 @@ test_requirements = []
 
 setup(
     author="Mandy Mericle",
-    author_email="mandmericle@gmail.com",
+    author_email="mericleac@github.com",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -43,7 +43,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/americle/train_alerts",
+    url="https://github.com/mericleac/alexa_train_alerts",
     version="0.1.0",
     zip_safe=False,
 )
