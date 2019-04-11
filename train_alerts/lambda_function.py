@@ -80,7 +80,8 @@ def get_next_train(station, color=None, destination=None):
     time_to_arrival = (
         datetime.datetime.strptime(
             data["ctatt"]["eta"][0]["arrT"], "%Y-%m-%dT%H:%M:%S")
-        - datetime.datetime.now()
+        - datetime.datetime.strptime(
+            data["ctatt"]["eta"][0]["prdt"], "%Y-%m-%dT%H:%M:%S")
     )
 
     return {
@@ -136,24 +137,6 @@ def get_welcome_response():
     should_end_session = False
     return build_response(
         session_attributes,
-        build_speechlet_response(
-            card_title, speech_output, reprompt_text, should_end_session
-        ),
-    )
-
-
-def hello_world(intent, session):
-    """ Returns a simple hello world message """
-
-    card_title = intent["name"]
-    should_end_session = False
-
-    speech_output = "Hello World!"
-    reprompt_text = (
-        "Hello world is the typical title " "for a developer's first application."
-    )
-    return build_response(
-        {},
         build_speechlet_response(
             card_title, speech_output, reprompt_text, should_end_session
         ),
@@ -262,9 +245,7 @@ def on_intent(intent_request, session):
     intent_name = intent_request["intent"]["name"]
 
     # Dispatch to your skill's intent handlers
-    if intent_name == "HelloWorldIntent":
-        return hello_world(intent, session)
-    elif intent_name == "GetNextTrain":
+    if intent_name == "GetNextTrain":
         return get_next_train_intent(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
