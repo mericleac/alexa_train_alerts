@@ -70,11 +70,11 @@ def build_response(session_attributes, speechlet_response):
 # --------------- Helpers that fetch CTA Api data ------------------------------
 
 
-def get_next_train(station, color=None, destination=None):
+def get_next_train(station, color=None, destination=None, direction=None):
 
     data = requests.get(
         "http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=0fc2e48c0ad84d99923e89e8607776cd&max=1&{query}&outputType=JSON"
-        .format(query=get_stop_id(station))
+        .format(query=get_stop_id(station, color, destination, direction))
     ).json()
 
     time_to_arrival = (
@@ -92,7 +92,7 @@ def get_next_train(station, color=None, destination=None):
     }
 
 
-def get_stop_id(station, direction=None, destination=None, color=None):
+def get_stop_id(station, color=None, destination=None, direction=None):
     query = "station_name={station}".format(station=station)
     if direction is not None:
         query += "direction_id={direction}".format(
@@ -163,6 +163,7 @@ def get_next_train_intent(intent, session):
 
     color = None
     destination = None
+    direction = None
 
     if intent["slots"].get("station"):
         station = intent["slots"]["station"]["value"]
@@ -179,9 +180,11 @@ def get_next_train_intent(intent, session):
     if intent["slots"].get("color"):
         color = intent["slots"]["color"]["value"]
     if intent["slots"].get("destination"):
-        destination = intent["slots"]["station"]["value"]
+        destination = intent["slots"]["destination"]["value"]
+    if intent["slots"].get("direction"):
+        direction = intent["slots"]["direction"]["value"]
 
-    data = get_next_train(station, color, destination)
+    data = get_next_train(station, color, destination, direction)
 
     speech_output = (
         "The next %s bound %s Line train "
