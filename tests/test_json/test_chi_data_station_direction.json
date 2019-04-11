@@ -1,0 +1,21 @@
+[
+    {
+        "ada": true,
+        "blue": false,
+        "brn": false,
+        "direction_id": "N",
+        "g": false,
+        "location": { "type": "Point", "coordinates": [-87.672892, 42.019063] },
+        "map_id": "40900",
+        "o": false,
+        "p": true,
+        "pexp": true,
+        "pnk": false,
+        "red": false,
+        "station_descriptive_name": "Howard (Red, Purple & Yellow Lines)",
+        "station_name": "Howard",
+        "stop_id": "30175",
+        "stop_name": "Howard (Linden, Skokie-bound)",
+        "y": true
+    }
+]

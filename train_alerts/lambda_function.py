@@ -31,11 +31,6 @@ direction_mapping = {
     "West": "W"
 }
 
-# This should be dynamically generated from the city of chicago api...
-station_mapping = {
-    "Howard": "40900"
-}
-
 # --------------- Helpers that build all of the responses ----------------------
 
 
@@ -66,8 +61,8 @@ def build_response(session_attributes, speechlet_response):
 def get_next_train(station, color=None, destination=None):
 
     data = requests.get(
-        "http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=0fc2e48c0ad84d99923e89e8607776cd&max=1&mapid={station_num}&outputType=JSON"
-        .format(station_num=station_mapping[station])
+        "http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=0fc2e48c0ad84d99923e89e8607776cd&max=1&{query}&outputType=JSON"
+        .format(query=get_stop_id(station))
     ).json()
 
     time_to_arrival = (
@@ -87,22 +82,22 @@ def get_next_train(station, color=None, destination=None):
 def get_stop_id(station, direction=None, destination=None):
     if direction is not None:
         data = requests.get(
-            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}&direction_id={direction}"
+            "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}&direction_id={direction}&$where=stop_name%20not%20like%20%27%25Terminal%20arrival%25%27"
             .format(station=station, direction=direction_mapping[direction])
         ).json()
-        query = "stop_id=" + data[0]["stop_id"]
+        query = "stpid=" + data[0]["stop_id"]
     elif destination is not None:
         data = requests.get(
             "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}&$where=stop_name like '%25{destination}%25"
             .format(station=station, destination=destination)
         ).json()
-        query = "stop_id=" + data[0]["stop_id"]
+        query = "stpid=" + data[0]["stop_id"]
     else:
         data = requests.get(
             "https://data.cityofchicago.org/resource/8mj8-j3c4.json?station_name={station}"
             .format(station=station)
         ).json()
-        query = "map_id=" + data[0]["map_id"]
+        query = "mapid=" + data[0]["map_id"]
     return query
 
 
