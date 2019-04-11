@@ -78,7 +78,7 @@
                 },
                 "destination": {
                     "name": "destination",
-                    "value": "loop",
+                    "value": "linden",
                     "resolutions": {
                         "resolutionsPerAuthority": [
                             {
@@ -89,7 +89,7 @@
                                 "values": [
                                     {
                                         "value": {
-                                            "name": "Loop",
+                                            "name": "Linden",
                                             "id": "89d7b10cb4238977d2b523dfd9ea7745"
                                         }
                                     }

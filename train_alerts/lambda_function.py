@@ -26,14 +26,14 @@ route_colors = {
 
 # Will eventually need to add support for purple express
 chi_data_color_mapping = {
-    "Red": "red",
-    "Blue": "blue",
-    "Brown": "brn",
-    "Green": "g",
-    "Orange": "o",
-    "Purple": "p",
-    "Pink": "pnk",
-    "Yellow": "y"
+    "red": "red",
+    "blue": "blue",
+    "brown": "brn",
+    "green": "g",
+    "orange": "o",
+    "purple": "p",
+    "pink": "pnk",
+    "yellow": "y"
 }
 
 direction_mapping = {
@@ -95,13 +95,13 @@ def get_next_train(station, color=None, destination=None, direction=None):
 def get_stop_id(station, color=None, destination=None, direction=None):
     query = "station_name={station}".format(station=station)
     if direction is not None:
-        query += "direction_id={direction}".format(
+        query += "&direction_id={direction}".format(
             direction=direction_mapping[direction])
     if destination is not None:
-        query += "$where=stop_name like '%25{destination}%25'".format(
-            destination=destination)
+        query += "&$where=stop_name like '%25{destination}%25'".format(
+            destination=destination.title())
     if color is not None:
-        query += "{color}=true".format(color=chi_data_color_mapping[color])
+        query += "&{color}=true".format(color=chi_data_color_mapping[color])
 
     data = requests.get(
         "https://data.cityofchicago.org/resource/8mj8-j3c4.json?{query}"
