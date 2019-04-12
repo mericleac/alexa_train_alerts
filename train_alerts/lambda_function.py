@@ -93,7 +93,7 @@ def get_next_train(station, color=None, destination=None, direction=None):
 
 
 def get_stop_id(station, color=None, destination=None, direction=None):
-    query = "station_name={station}".format(station=station)
+    query = "station_name={station}".format(station=station.title())
     if direction is not None:
         query += "&direction_id={direction}".format(
             direction=direction_mapping[direction])
@@ -166,23 +166,24 @@ def get_next_train_intent(intent, session):
     direction = None
 
     if intent["slots"].get("station"):
-        station = intent["slots"]["station"]["value"]
-    else:
-        return build_response(
-            {},
-            build_speechlet_response(
-                card_title,
-                "Please specify a station in your request",
-                None,
-                should_end_session
+        if intent["slots"]["station"].get("value"):
+            station = intent["slots"]["station"]["value"]
+        else:
+            return build_response(
+                {},
+                build_speechlet_response(
+                    card_title,
+                    "Please specify a station in your request",
+                    None,
+                    should_end_session
+                )
             )
-        )
     if intent["slots"].get("color"):
-        color = intent["slots"]["color"]["value"]
+        color = intent["slots"]["color"].get("value")
     if intent["slots"].get("destination"):
-        destination = intent["slots"]["destination"]["value"]
+        destination = intent["slots"]["destination"].get("value")
     if intent["slots"].get("direction"):
-        direction = intent["slots"]["direction"]["value"]
+        direction = intent["slots"]["direction"].get("value")
 
     data = get_next_train(station, color, destination, direction)
 
@@ -292,6 +293,8 @@ def lambda_handler(event, context):
     # if (event['session']['application']['applicationId'] !=
     #         "amzn1.echo-sdk-ams.app.[unique-value-here]"):
     #     raise ValueError("Invalid Application ID")
+
+    print(event)
 
     if event["session"]["new"]:
         on_session_started(

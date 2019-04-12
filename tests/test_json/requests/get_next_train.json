@@ -54,7 +54,7 @@
             "slots": {
                 "station": {
                     "name": "station",
-                    "value": "Howard",
+                    "value": "howard",
                     "resolutions": {
                         "resolutionsPerAuthority": [
                             {
